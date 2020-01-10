@@ -36,8 +36,7 @@ namespace ElasticIdentitySample.Mvc
             {
                 settings.BasicAuthentication(elasticSettings.UserName, elasticSettings.Password);
             }
-            settings.MapDefaultTypeIndices(m => m
-                .Add(typeof(ElasticIdentityUser), "users"));
+            settings.DefaultMappingFor(typeof(ElasticIdentityUser), m=> m.IndexName("users"));
             var elasticClient = new ElasticClient(settings);
             
             services.AddIdentity<ElasticIdentityUser, ElasticIdentityUserRole>()
@@ -65,8 +64,8 @@ namespace ElasticIdentitySample.Mvc
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            //loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
             {

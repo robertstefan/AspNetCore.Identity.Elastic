@@ -1,11 +1,14 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
-using Xunit;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Identity;
+
 using Nest;
+
+using Xunit;
 
 namespace AspNetCore.Identity.Elastic.Tests
 {
@@ -39,7 +42,7 @@ namespace AspNetCore.Identity.Elastic.Tests
             var store = new ElasticUserStore<string, ElasticIdentityUser>(_elasticClient);
             store.CreateAsync(_user1, CancellationToken.None).GetAwaiter().GetResult();
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
         }
 
         [Fact]
@@ -245,7 +248,7 @@ namespace AspNetCore.Identity.Elastic.Tests
             noClaimsUser21.Claims.Add(new ElasticIdentityUserClaim(claimType12));
             await _store.CreateAsync(noClaimsUser21, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             var users = await _store.GetUsersForClaimAsync(claimType11, CancellationToken.None);
 
@@ -313,7 +316,7 @@ namespace AspNetCore.Identity.Elastic.Tests
             user21.Logins.Add(type12);
             await _store.CreateAsync(user21, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             var user = await _store.FindByLoginAsync(type11.LoginProvider, type11.ProviderKey, CancellationToken.None);
 
@@ -327,7 +330,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             var result = await _store.CreateAsync(_user2, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             Assert.True(result.Succeeded);
 
@@ -341,7 +344,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             var updateResult = await _store.UpdateAsync(_user2, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
             
@@ -355,7 +358,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             updateResult = await _store.UpdateAsync(_user2, CancellationToken.None);
             
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
             
@@ -380,7 +383,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             Assert.True(result.Succeeded);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             var user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
 
@@ -392,7 +395,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             var updateResult = await _store.UpdateAsync(_user2, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
 
@@ -420,7 +423,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
             Assert.True(result.Succeeded);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             var user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
 
@@ -432,7 +435,7 @@ namespace AspNetCore.Identity.Elastic.Tests
             
             var updateResult = await _store.UpdateAsync(_user2, CancellationToken.None);
 
-            _elasticClient.Refresh(_indexName);
+            _elasticClient.Indices.Refresh(_indexName);
 
             user = await _store.FindByIdAsync(_user2.Id, CancellationToken.None);
 

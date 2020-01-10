@@ -53,7 +53,7 @@ namespace AspNetCore.Identity.Elastic
 
             var createResponse = await ElasticClient
                 .CreateAsync(user,
-                    c => c.Index(Options.IndexName).Type(Options.UserDocType),
+                    c => c.Index(Options.IndexName),//.Type(Options.UserDocType),
                     cancellationToken);
 
             return ProcessChangeOperationResponseForIdentityOperation(createResponse);
@@ -123,7 +123,7 @@ namespace AspNetCore.Identity.Elastic
                     d => d
                         .Doc(user)
                         .Index(Options.IndexName)
-                        .Type(Options.UserDocType)
+                        //.Type(Options.UserDocType)
                         .RetryOnConflict(3),
                     cancellationToken);
             return indexResponse;
@@ -179,7 +179,7 @@ namespace AspNetCore.Identity.Elastic
         public ElasticUserStore(Uri elasticServerUri, string indexName)
             : this(new ElasticClient(new ConnectionSettings(elasticServerUri)
                 .ThrowExceptions()
-                .MapDefaultTypeIndices(x => x.Add(typeof(TUser), indexName))))
+                .DefaultMappingFor(typeof(TUser), m => m.IndexName(indexName))))
         {
         }
 
@@ -231,7 +231,7 @@ namespace AspNetCore.Identity.Elastic
                 var sd = new SearchDescriptor<TUser>()
                     .Version()
                     .Index(Options.IndexName)
-                    .Type(Options.UserDocType)
+                    //.Type(Options.UserDocType)
                     .Query(q => q
                         .Bool(b => b
                             .MustNot(
@@ -304,7 +304,8 @@ namespace AspNetCore.Identity.Elastic
 
             var createResponse = await ElasticClient
                 .CreateAsync(user,
-                    c => c.Index(Options.IndexName).Type(Options.UserDocType).Refresh(Refresh.True),
+                    c => c.Index(Options.IndexName)//.Type(Options.UserDocType)
+                    .Refresh(Refresh.True),
                     cancellationToken);
 
             return ProcessChangeOperationResponseForIdentityOperation(createResponse);
@@ -328,7 +329,7 @@ namespace AspNetCore.Identity.Elastic
             var deleteResponse = await ElasticClient.DeleteAsync(DocumentPath<TUser>.Id(user)
                 , d => d
                     .Index(Options.IndexName)
-                    .Type(Options.UserDocType)
+                    //.Type(Options.UserDocType)
                     .Version(user.Version ?? 1)
                     .Refresh(Refresh.True)
                 , cancellationToken);
@@ -347,7 +348,7 @@ namespace AspNetCore.Identity.Elastic
 
             var sd = new SearchDescriptor<TUser>()
                 .Index(Options.IndexName)
-                .Type(Options.UserDocType)
+                //.Type(Options.UserDocType)
                 .Version()
                 .Query(q => q
                     .Bool(b => b
@@ -397,7 +398,7 @@ namespace AspNetCore.Identity.Elastic
 
             var sd = new SearchDescriptor<TUser>()
                 .Index(Options.IndexName)
-                .Type(Options.UserDocType)
+                //.Type(Options.UserDocType)
                 .Version()
                 .Size(1)
                 .Query(q => q
@@ -461,7 +462,7 @@ namespace AspNetCore.Identity.Elastic
 
             var sd = new SearchDescriptor<TUser>()
                 .Index(Options.IndexName)
-                .Type(Options.UserDocType)
+                //.Type(Options.UserDocType)
                 .Version()
                 .Size(1)
                 .Query(q => q
@@ -676,7 +677,7 @@ namespace AspNetCore.Identity.Elastic
 
             var sd = new SearchDescriptor<TUser>()
                 .Index(Options.IndexName)
-                .Type(Options.UserDocType)
+                //.Type(Options.UserDocType)
                 .Version()
                 .Size(Options.QuerySize)
                 .Query(q => q
@@ -983,7 +984,7 @@ namespace AspNetCore.Identity.Elastic
                 .UpdateAsync(new DocumentPath<TUser>(user),
                     d => d
                         .Index(Options.IndexName)
-                        .Type(Options.UserDocType)
+                        //.Type(Options.UserDocType)
                         .Doc(user)
                         .Refresh(Refresh.True),
                     cancellationToken);
@@ -1075,7 +1076,7 @@ namespace AspNetCore.Identity.Elastic
 
             var sd = new SearchDescriptor<TUser>()
                 .Index(Options.IndexName)
-                .Type(Options.UserDocType)
+                //.Type(Options.UserDocType)
                 .Version()
                 .Size(Options.QuerySize)
                 .Query(q => q
@@ -1173,7 +1174,9 @@ namespace AspNetCore.Identity.Elastic
             bool excludeDeleted = true)
         {
             var getResponse = await ElasticClient.GetAsync(DocumentPath<TUser>.Id(userId),
-                s => s.Index(Options.IndexName).Type(Options.UserDocType), cancellationToken);
+                s => s.Index(Options.IndexName)
+                //.Type(Options.UserDocType)
+                , cancellationToken);
 
             var user = getResponse.Found ? getResponse.Source : null;
 
@@ -1200,14 +1203,14 @@ namespace AspNetCore.Identity.Elastic
 
         private void EnsureIndexExists()
         {
-            var indexExists = ElasticClient.IndexExists(new IndexExistsRequest(Options.IndexName)).Exists;
+            var indexExists = ElasticClient.Indices.Exists(new IndexExistsRequest(Options.IndexName)).Exists;
 
             if (indexExists)
             {
                 return;
             }
 
-            var response = ElasticClient.CreateIndex(Options.IndexName, GetIndexMappings);
+            var response = ElasticClient.Indices.Create(Options.IndexName, GetIndexMappings);
 
             if (!response.ApiCall.Success)
             {

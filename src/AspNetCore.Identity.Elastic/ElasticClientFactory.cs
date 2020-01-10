@@ -14,11 +14,9 @@ namespace AspNetCore.Identity.Elastic
         {
             var settings = new ConnectionSettings(
                 new SingleNodeConnectionPool(node),
-                new HttpConnection(),
-                new SerializerFactory(DefineSerializationSettings));
+                new HttpConnection());
 
-            settings.MapDefaultTypeIndices(m => m
-                .Add(typeof(ElasticIdentityUser), defaultIndex));
+            settings.DefaultMappingFor(typeof(ElasticIdentityUser), m => m.IndexName(defaultIndex));
 
             settings.BasicAuthentication("elastic","changeme");
 
