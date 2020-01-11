@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
@@ -6,7 +7,7 @@ namespace ElasticIdentitySample.Mvc
 {
     public class Program
     {
-       public static void Main(string[] args)
+        public static void Main(string[] args)
         {
             BuildWebHost(args).Run();
         }

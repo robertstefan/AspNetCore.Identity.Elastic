@@ -261,7 +261,7 @@ namespace AspNetCore.Identity.Elastic
             foreach (var claim in claims.Select(c => new ElasticIdentityUserClaim(c)))
             {
                 if (!user.Claims.Contains(claim))
-                { 
+                {
                     user.Claims.Add(claim);
                 }
             }
@@ -502,7 +502,7 @@ namespace AspNetCore.Identity.Elastic
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var result = (IList<Claim>) user
+            var result = (IList<Claim>)user
                 .Claims
                 .Select(x => x.ToClaim())
                 .ToList();
@@ -574,7 +574,7 @@ namespace AspNetCore.Identity.Elastic
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var userLoginInfos = (IList<UserLoginInfo>) user.Logins.Select(l => l.ToUserLoginInfo()).ToList();
+            var userLoginInfos = (IList<UserLoginInfo>)user.Logins.Select(l => l.ToUserLoginInfo()).ToList();
 
             return Task.FromResult(userLoginInfos);
         }
@@ -771,7 +771,7 @@ namespace AspNetCore.Identity.Elastic
             {
                 user.Claims.Remove(claim);
             }
-    
+
             return Task.CompletedTask;
         }
 
@@ -989,7 +989,7 @@ namespace AspNetCore.Identity.Elastic
                         .Refresh(Refresh.True),
                     cancellationToken);
 
-            return ProcessChangeOperationResponseForIdentityOperation(indexResponse);            
+            return ProcessChangeOperationResponseForIdentityOperation(indexResponse);
         }
 
         public async Task AddToRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
@@ -1043,7 +1043,7 @@ namespace AspNetCore.Identity.Elastic
 
             var roles = user.Roles.Select(r => r.RoleId).ToList();
 
-            return Task.FromResult((IList<string>) roles);
+            return Task.FromResult((IList<string>)roles);
         }
 
         public async Task<bool> IsInRoleAsync(TUser user, string roleName, CancellationToken cancellationToken)
@@ -1122,7 +1122,7 @@ namespace AspNetCore.Identity.Elastic
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return  Task.FromResult(user.PhoneNumber);
+            return Task.FromResult(user.PhoneNumber);
         }
 
         public Task<bool> GetPhoneNumberConfirmedAsync(TUser user, CancellationToken cancellationToken)
@@ -1246,7 +1246,7 @@ namespace AspNetCore.Identity.Elastic
                     return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
                 case IResponse r when r.OriginalException != null:
                     throw response.OriginalException;
-                default :
+                default:
                     throw new Exception($"{response.ServerError.Status} - {response.ServerError.Error}");
             }
         }

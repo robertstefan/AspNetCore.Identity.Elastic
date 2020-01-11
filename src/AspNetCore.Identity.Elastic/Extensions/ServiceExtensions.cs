@@ -32,7 +32,7 @@ namespace AspNetCore.Identity.Elastic.Extensions
 
             identityBuilder.Services.TryAddSingleton<IElasticClient>(elasticClient);
             identityBuilder.Services.TryAddSingleton<IPasswordHasher<ElasticIdentityUser>, PasswordHasher<ElasticIdentityUser>>();
-            identityBuilder.Services.TryAddSingleton<ILookupNormalizer, LowerInvariantLookupNormalizer>();
+            //identityBuilder.Services.TryAddSingleton<ILookupNormalizer, LowerInvariantLookupNormalizer>();
             identityBuilder.Services.TryAddSingleton<ISecurityStampValidator, SecurityStampValidator<ElasticIdentityUser>>();
         
             return identityBuilder;
