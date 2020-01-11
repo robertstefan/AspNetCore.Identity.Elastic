@@ -1,8 +1,11 @@
 ﻿using System;
+
 using AspNetCore.Identity.Elastic;
-using AspNetCore.Identity.Elastic.Extensions;
 using AspNetCore.Identity.Elastic.Config;
+using AspNetCore.Identity.Elastic.Extensions;
+
 using ElasticIdentitySample.Mvc.Services;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+
 using Nest;
 
 namespace ElasticIdentitySample.Mvc
@@ -58,7 +62,10 @@ namespace ElasticIdentitySample.Mvc
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             
-            services.AddMvc();
+            services.AddMvc(x =>
+            {
+                x.EnableEndpointRouting = false;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,7 +77,7 @@ namespace ElasticIdentitySample.Mvc
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
+                //sapp.UseBrowserLink();
             }
             else
             {
