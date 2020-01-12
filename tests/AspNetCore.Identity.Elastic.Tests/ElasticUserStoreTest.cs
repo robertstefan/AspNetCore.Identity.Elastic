@@ -458,7 +458,7 @@ namespace AspNetCore.Identity.Elastic.Tests
 
         public void Dispose()
         {
-            _elasticClient.DeleteIndex(_indexName);
+            _elasticClient.Indices.Delete(_indexName);
         }
     }
 }
