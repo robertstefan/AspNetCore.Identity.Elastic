@@ -13,9 +13,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Nest;
+
+using OpenTracing;
+using OpenTracing.Util;
 
 namespace ElasticIdentitySample.Mvc
 {
@@ -66,10 +70,28 @@ namespace ElasticIdentitySample.Mvc
             {
                 x.EnableEndpointRouting = false;
             });
+
+            services.AddSingleton<ITracer>(cli =>
+            {
+                Environment.SetEnvironmentVariable("JAEGER_SERVICE_NAME", "ElasticIdentity.Sample.Mvc");
+
+                var loggerFactory = new LoggerFactory();
+
+                var config = Jaeger.Configuration.FromEnv(loggerFactory);
+                var tracer = config.GetTracer();
+
+                if (!GlobalTracer.IsRegistered())
+                {
+                    // Allows code that can't use DI to also access the tracer.
+                    GlobalTracer.Register(tracer);
+                }
+
+                return tracer;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             //loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             //loggerFactory.AddDebug();

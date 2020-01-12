@@ -1224,15 +1224,6 @@ namespace AspNetCore.Identity.Elastic
                 .Settings(s => s
                     .NumberOfShards(Options.NumberOfShards)
                     .NumberOfReplicas(Options.NumberOfReplicas)
-                )
-                .Mappings(m => m
-                    .Map<TUser>(
-                        Options.UserDocType,
-                        mm => mm
-                            .AutoMap()
-                            .AllField(af => af
-                                .Enabled(false))
-                    )
                 );
         }
 

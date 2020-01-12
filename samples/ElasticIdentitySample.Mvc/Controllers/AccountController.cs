@@ -1,15 +1,20 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+
 using AspNetCore.Identity.Elastic;
+
 using ElasticIdentitySample.Mvc.Models.AccountViewModels;
 using ElasticIdentitySample.Mvc.Services;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+
+using OpenTracing;
 
 namespace ElasticIdentitySample.Mvc.Controllers
 {
@@ -21,19 +26,22 @@ namespace ElasticIdentitySample.Mvc.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly ITracer _tracer;
 
         public AccountController(
             UserManager<ElasticIdentityUser> userManager,
             SignInManager<ElasticIdentityUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ITracer tracer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _tracer = tracer;
         }
 
         //
@@ -56,12 +64,21 @@ namespace ElasticIdentitySample.Mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
+            var builder = _tracer.BuildSpan("Post::Login");
+            var span = builder.Start();
+
+            // Set some context data
+            span.Log($"User login: model={model.UserName}");
+            span.SetTag("Jaeger Testing Client", "Login request");
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: true);
+
+                span.Finish();
 
                 if (result.Succeeded)
                 {
